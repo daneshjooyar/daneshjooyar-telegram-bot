@@ -5,7 +5,7 @@ namespace DaneshjooyarTelegramBot;
 */
 class DaneshjooyarTelegramBotCore
 {
-	
+
 	protected $version 		= '1.0.0';
 	
 	public $token 			= '382027342:AAE_lcuWvSYaneNtTgkk2nOFGiakTN8TBpc';
@@ -35,6 +35,8 @@ class DaneshjooyarTelegramBotCore
 	public $event;
 
 	public $type;
+
+	public $result;
 
 	/**
 	 * if( isMessage ) {
@@ -69,31 +71,33 @@ class DaneshjooyarTelegramBotCore
 
 		$this->url          = "https://api.telegram.org/bot" . $this->token . "/";
 
-		$result = $this->post( 'getUpdates' );
+		//$result = $this->post( 'getUpdates' );
+		$updates = file_get_contents( "php://input" );
+		$this->result = json_decode( $updates );
 
 		/**
 		 * Check if event is message
 		 */
-		if( isset( $result->message ) ) {
+		if( isset( $this->result->message ) ) {
 
 			$this->type = 'message';
 
-			$this->first_name 	= $result->message->from->first_name;
-			$this->last_name 	= $result->message->from->last_name;
-			$this->username 	= $result->message->from->username;
-			$this->message_id 	= $result->message->message_id;
-			$this->from 		= $result->message->from->id;
-			$this->chat_id 		= $result->message->chat_id;
-			$this->text 		= $result->message->text;
-			$this->date 		= $result->message->date;
+			$this->first_name 	= $this->result->message->from->first_name;
+			$this->last_name 	= $this->result->message->from->last_name;
+			$this->username 	= $this->result->message->from->username;
+			$this->message_id 	= $this->result->message->message_id;
+			$this->from 		= $this->result->message->from->id;
+			$this->chat_id 		= $this->result->message->chat_id;
+			$this->text 		= $this->result->message->text;
+			$this->date 		= $this->result->message->date;
 
 
 			/**
 			 * Check if message is command
 			 */
-			if( isset( $result->message->entities ) ) {
+			if( isset( $this->result->message->entities ) ) {
 
-				foreach ($result->message->entities as $entity) {
+				foreach ($this->result->message->entities as $entity) {
 
 					$this->isCommand = $entity->type == 'bot_command' ? true : false;
 
@@ -112,42 +116,42 @@ class DaneshjooyarTelegramBotCore
 		/**
 		 * Check for type of chat: group , ...
 		 */
-		if( isset( $result->message->chat->type ) ) {
+		if( isset( $this->result->message->chat->type ) ) {
 
-			$this->type = $result->message->chat->type;
+			$this->type = $this->result->message->chat->type;
 
-		}elseif( isset( $result->channel_post->chat->type ) ){
+		}elseif( isset( $this->result->channel_post->chat->type ) ){
 
-			$this->type = $result->channel_post->chat->type;
+			$this->type = $this->result->channel_post->chat->type;
 
 		}
 
-		if( isset( $result->message->new_chat_members ) ){
+		if( isset( $this->result->message->new_chat_members ) ){
 
-			if( $result->message->new_chat_members->username == $this->botUserName ) {
+			if( $this->result->message->new_chat_members->username == $this->botUserName ) {
 
 				//You join in group
 				
 			}else{
 
-				//$result->message->new_chat_members->username
-				//$result->message->new_chat_members->first_name
-				//$result->message->new_chat_members->last_name
+				//$this->result->message->new_chat_members->username
+				//$this->result->message->new_chat_members->first_name
+				//$this->result->message->new_chat_members->last_name
 			
 			}
 		}
 
-		if( isset( $result->message->left_chat_member ) ){
+		if( isset( $this->result->message->left_chat_member ) ){
 
-			if( $result->message->left_chat_member->username == $this->botUserName ) {
+			if( $this->result->message->left_chat_member->username == $this->botUserName ) {
 				
 				//You left in group
 			
 			}else{
 
-				//$result->message->new_chat_members->username
-				//$result->message->new_chat_members->first_name
-				//$result->message->new_chat_members->last_name
+				//$this->result->message->new_chat_members->username
+				//$this->result->message->new_chat_members->first_name
+				//$this->result->message->new_chat_members->last_name
 			
 			}
 		}		
@@ -159,7 +163,7 @@ class DaneshjooyarTelegramBotCore
 	}
 
 	public function isChannel() {
-		return $this->type == 'channel' true : false;
+		return $this->type == 'channel' ? true : false;
 	}
 
 	public function isMessage(  ) {
@@ -174,16 +178,16 @@ class DaneshjooyarTelegramBotCore
 
 		if( $event == 'bot_join_group' || $event == 'user_join_group' ) {
 
-			if( isset( $result->message->new_chat_members ) ) {
-				if( $result->message->new_chat_members->username == $this->botUserName ) {
+			if( isset( $this->result->message->new_chat_members ) ) {
+				if( $this->result->message->new_chat_members->username == $this->botUserName ) {
 					//You join in group
 					if( $event == 'bot_join_group' ) {
 						//run $callback
 					}
 				} else { // $event == 'user_join_group'
-					//$result->message->new_chat_members->username
-					//$result->message->new_chat_members->first_name
-					//$result->message->new_chat_members->last_name
+					//$this->result->message->new_chat_members->username
+					//$this->result->message->new_chat_members->first_name
+					//$this->result->message->new_chat_members->last_name
 					//run $callback
 				}
 			}
@@ -192,16 +196,16 @@ class DaneshjooyarTelegramBotCore
 
 		if( $event == 'bot_left_group' || $event == 'user_left_group' ) {
 
-			if( isset( $result->message->left_chat_member ) ){
-				if( $result->message->left_chat_member->username == $this->botUserName ) {
+			if( isset( $this->result->message->left_chat_member ) ){
+				if( $this->result->message->left_chat_member->username == $this->botUserName ) {
 					//You left in group
 					if( $event == 'bot_left_group' ) {
 						//run $callback
 					}
 				}else{ //$event == 'user_left_group'
-					//$result->message->new_chat_members->username
-					//$result->message->new_chat_members->first_name
-					//$result->message->new_chat_members->last_name
+					//$this->result->message->new_chat_members->username
+					//$this->result->message->new_chat_members->first_name
+					//$this->result->message->new_chat_members->last_name
 					//run $callback
 				}
 			}
@@ -216,9 +220,7 @@ class DaneshjooyarTelegramBotCore
 
 	public function getMe() {
 
-		$result = $this->post( 'getMe' );
-
-		return json_decode( $result );
+		return $this->result;
 
 	}
 
@@ -307,6 +309,36 @@ class DaneshjooyarTelegramBotCore
 	    curl_setopt($curl_handle, CURLOPT_POSTFIELDS, array( 'text' => print_r( $msg, true ) ));
 	    curl_exec($curl_handle);
 	    curl_close($curl_handle);
+	}
+
+	/**
+	 * 
+	 * Generate v4 UUID
+	 * 
+	 * Version 4 UUIDs are pseudo-random.
+	 */
+	public function uuid() 
+	{
+		return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+
+		// 32 bits for "time_low"
+		mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+
+		// 16 bits for "time_mid"
+		mt_rand(0, 0xffff),
+
+		// 16 bits for "time_hi_and_version",
+		// four most significant bits holds version number 4
+		mt_rand(0, 0x0fff) | 0x4000,
+
+		// 16 bits, 8 bits for "clk_seq_hi_res",
+		// 8 bits for "clk_seq_low",
+		// two most significant bits holds zero and one for variant DCE1.1
+		mt_rand(0, 0x3fff) | 0x8000,
+
+		// 48 bits for "node"
+		mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+		);
 	}
 
 }

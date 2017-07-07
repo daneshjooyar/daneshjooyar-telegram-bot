@@ -14,7 +14,11 @@ class ComponentsManager extends DaneshjooyarTelegramBotCore
 
 	public function loadComponents() {
 
-		
+		$profile = new Profile();
+		$profile->addUserField();
+
+		$notification = new Notification();
+		$notification->activeComments();
 		
 	}
 }
