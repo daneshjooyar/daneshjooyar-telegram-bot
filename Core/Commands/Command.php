@@ -14,4 +14,7 @@ class Command extends DaneshjooyarTelegramBotCore
 	{
 		# code...
 	}
+
+	
+
 }

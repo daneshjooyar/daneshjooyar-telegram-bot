@@ -13,8 +13,17 @@ namespace DaneshjooyarTelegramBot;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Define Absolute path
+ */
 define( 'DYTB_PATH', plugin_dir_path( __FILE__ ) );
-define( 'DYTB_PLUGIN_CORE', DYTB_PATH . 'Core/' );
+define( 'DYTB_CORE', DYTB_PATH . 'Core/' );
+
+/**
+ * Define Urls
+ */
+define( 'DYTB_ASSETS', plugin_dir_url( __FILE__ ) . 'assets/' );
+define( 'DYTB_IMAGES', DYTB_ASSETS . 'images/' );
 
 /**
  * Register AutoLoader class
@@ -25,7 +34,7 @@ define( 'DYTB_PLUGIN_CORE', DYTB_PATH . 'Core/' );
  */
 spl_autoload_register( function( $class ) { //Ex: DaneshjooyarTelegramBot\Core
 	if( strpos( $class,  'DaneshjooyarTelegramBot' ) === 0 ){
-		$class = str_replace( 'DaneshjooyarTelegramBot\\', DYTB_PLUGIN_CORE,  $class ); //Ex: {PluginPath}\Core
+		$class = str_replace( 'DaneshjooyarTelegramBot\\', DYTB_CORE,  $class ); //Ex: {PluginPath}\Core
 		$class = str_replace( '\\' , '/',  $class ); //Ex: {PluginPath}/Core
 		$class.= '.php'; //Ex: {PluginPath}\Core/Loader.php
 		include $class;
@@ -42,5 +51,5 @@ add_action('plugins_loaded', function(){
 register_activation_hook( __FILE__, array('DaneshjooyarTelegramBot\ActivationDeactivation', 'activate'));
 register_deactivation_hook( __FILE__, array('DaneshjooyarTelegramBot\ActivationDeactivation', 'deactivate'));
 
-$daneshjooyarPlugin = new Loader();
-$daneshjooyarPlugin->run();
+$DaneshjooyarTelegramBot = new Loader();
+$DaneshjooyarTelegramBot->run();
